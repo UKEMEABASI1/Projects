@@ -1,2 +1,2 @@
 # Projects
-This os where all Projects are stored
+This is where all Projects are stored
