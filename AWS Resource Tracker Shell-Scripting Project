@@ -1,0 +1,93 @@
+Overview
+
+The AWS Resource Tracker script is frequently used in real-world DevOps scenarios to give a summary of the AWS resources that are being used in an environment.
+Its goal is to assist businesses in efficiently monitoring and managing their AWS resources. The script retrieves data about several AWS services, including S3 buckets, EC2 instances, Lambda functions, and IAM users, by using the AWS Command Line Interface (CLI).
+
+What is the purpose of this project?
+A list of S3 buckets, EC2 instances, Lambda functions, and IAM users connected to an AWS account can be easily retrieved by users by executing the AWS Resource Tracker script.
+This data can be useful for a number of tasks, such as resource optimization, inventory management, auditing, and security evaluation.
+
+Build the project.
+Create an EC2 instance
+
+Build the project
+Create EC2 Instance
+Step 1. Go to your AWS account and log in, then search for EC2 Instances in the search bar. Or you can click on the services button that is on the top left corner of your dashboard, from there also you can search for the same. Then click on the Launch Instance button.
+Step 2. Give it a name of your choice, ubuntu as a machine image, select your key-pair or create one if not have any. Leave the instance type t2.micro ie free tier as the same and click again on the Launch Instance button.
+Step 3. Now click on the instance id which will give you detailed information about the running instance, there copy the public IP address.
+Launch the Instance
+Step 4: Open your terminal now and type the following command.
+
+"ssh -i /Users/yourpcname/Downloads/my-key-pair.pem ubuntu@ip_add"
+
+You have to go inside the directory where you have downloaded your key-pair and in my case, it is in /Downloads folder.
+Check yours and give a path accordingly. And don't forget to replace ip_address with your copied one. This will take you to the virtual machine which we have created in AWS.
+Create the Script
+Step 5. Now create a shell script file named aws_resource_tracker.sh and copy and paste the script below.
+
+#!/bin/bash
+#########################
+# Author: Your Name
+# Date: 28/05/23
+# Version: v1
+#
+# This script will report the AWS resource usage
+########################
+
+set -x
+
+# AWS S3
+# AWS EC2
+# AWS Lambda
+# AWS IAM Users
+
+# list s3 buckets
+echo "Print list of s3 buckets"
+aws s3 ls
+
+# list EC2 Instances
+echo "Print list of ec2 instances"
+aws ec2 describe-instances | jq '.Reservations[].Instances[].InstanceId'
+
+# list lambda
+echo "Print list of lambda functions"
+aws lambda list-functions
+
+# list IAM Users
+echo "Print list of iam users"
+aws iam list-users
+
+Note:
+It is best practice to always provide your details so that it will make it easier for other developers to contribute if they want to ie, metadata.
+The command set -x is given here in order to debug the script, this will print the command which we are running and then prints the output.
+The commands aws s3 ls, aws lambda list-functions and aws iam list-users print the information of the given statement.
+
+The command
+aws ec2 describe instances | jq '.Reservations[].Instances[].InstanceId' will give you all the Instance IDs present in your aws in JSON format.
+
+Test the script
+Step 6. Run the below command to see the output.
+./aws_resource_tracker.sh
+
+Apply CronJob
+To use cron jobs with your script, you can schedule it to run at specific intervals using the cron syntax. Here's an example of how you can modify your script to use cron jobs:
+Open a terminal and run the following command to edit the
+crontab file:
+crontab -e
+If prompted, choose your preferred text editor.
+Add a new line to the crontab file to schedule your script. For example, to run the script every day at 9 AM, you can add the following line: 0 9 * * * /path/to/your/script.sh
+Modify the path /path/to/your/script.sh to the actual
+path where your script is located.
+
+Save the crontab file and exit the text editor.
+The above cron expression (0 9 * * *) represents the schedule: minute (0), hour (9), any day of the month, any month, and any day of the week. You can customize the schedule based on your requirements using the cron syntax.
+By adding this line to the crontab file, your script will be executed automatically according to the defined schedule. The output of the script will be sent to your email address by default, or you can redirect the output to a file if needed.
+Make sure that the script is executable (chmod +x /path/to/your/script.sh) and that the necessary environment variables and AWS CLI configurations are set up correctly for the script to run successfully within the cron environment.
+
+Use Cases
+-Monitoring and auditing: By running this script periodically using cron jobs, you can monitor and audit your AWS resources. It provides insights into the status and details of different resources, such as S3 buckets, EC2 instances, Lambda functions, and IAM users.
+-Resource inventory: The script helps in maintaining an up-to-date inventory of your AWS resources. It lists the S3 buckets, EC2 instances, Lambda functions, and IAM users, allowing you to have a clear understanding of what resources exist in your environment.
+-Troubleshooting: In case of any issues or incidents, this script can be used to quickly gather information about the relevant AWS resources. For example, if there is an issue with an EC2 instance, you can run the script to get the instance ID and other details for further investigation.
+-Automation and reporting: The script can be integrated into an automated pipeline or workflow to generate regular reports about AWS resource usage. This information can be valuable for tracking costs, resource utilization, and compliance requirements.
+-Scalability and efficiency: In larger environments with numerous AWS resources, manually retrieving information about each resource can be time-consuming and error-prone. By using this script, you can automate the process and retrieve resource details in a consistent and efficient manner.
+-Overall, this script simplifies the process of gathering information about AWS resources, enhances visibility into your infrastructure, and supports effective management and monitoring of your DevOps environment.
